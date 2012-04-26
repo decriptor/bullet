@@ -17,40 +17,43 @@ TheBalls::reshape(int w, int h)
 {
 	_width = w;
 	_height = h;
-
+	glViewport(0, 0, (GLsizei) w, (GLsizei) h);
 	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(100.0, (GLfloat)w/(GLfloat)h, 0.5, 20.0);
+	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	// glOrtho Left, Right, Bottom, Top, Near, Far
 	glOrtho(-1.0, 1.5, -1.0, 1.0, -1.0, 1.0);
-	glMatrixMode(GL_MODELVIEW);
-	glViewport(0, 0, w, h);
 }
 
 void
 TheBalls::renderme()
 {
 	glLoadIdentity();
-	glPushMatrix();                             // Save Matrixes
-	glPolygonMode(GL_FRONT, GL_LINE);
-	glPolygonMode(GL_BACK, GL_FILL);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glTranslatef(-0.50, 0.50, 0.0);
-//	glRotatef(rotateX, 1.0, 0.0, 0.0);
-	glBegin(GL_POLYGON); {                        // Create a 8 sided polygon
-		glColor3f(red.r, red.g, red.b);
-		glVertex3f(-0.21, 0.0, 0.0);
-		glVertex3f(-0.07, -0.21, 0.0);
-		glColor3f(gray.r, gray.g, gray.b);
-		glVertex3f(+0.07, -0.25, 0.0);
-		glVertex3f(+0.25, -0.12, 0.0);
-		glColor3f(white.r, white.g, white.b);
-		glVertex3f(+0.08, +0.0, 0.0);
-		glVertex3f(+0.25, +0.12, 0.0);
-		glColor3f(orange.r, orange.g, orange.b);
-		glVertex3f(+0.07, +0.25, 0.0);
-		glVertex3f(-0.07, +0.21, 0.0);
-	} glEnd();
-	glPopMatrix();                              // Restore Matrixes
+	for (int j = m_dynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
+	{
+		btCollisionObject* obj = m_dynamicsWorld->getCollisionObjectArray()[j];
+		btRigidBody* body = btRigidBody::upcast(obj);
+		if (body && body->getMotionState())
+		{
+			btTransform trans;
+			body->getMotionState()->getWorldTransform(trans);
+			glPushMatrix(); {
+				GLfloat x = trans.getOrigin().getX();
+				GLfloat y = trans.getOrigin().getY();
+				GLfloat z = trans.getOrigin().getZ();
+
+				glTranslatef(x, y, z);
+				glColor3f(red.r, red.g, red.b);
+				glutSolidSphere(2.0, 15, 15);
+			} glPopMatrix();
+		}
+	}
+
+
 
 	/*
 	   if(m_dynamicsWorld)
@@ -88,8 +91,8 @@ TheBalls::renderme()
 	}
 	}
 	*/
-	glutSwapBuffers();
 	glFlush();
+	glutSwapBuffers();
 }
 
 void
@@ -105,8 +108,8 @@ TheBalls::clientMoveAndDisplay()
 
 	renderme();
 
-	glFlush();
 	swapBuffers();
+	glFlush();
 }
 
 void
@@ -115,19 +118,21 @@ TheBalls::displayCallback()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	renderme();
-	glFlush();
+
 	swapBuffers();
+	glFlush();
 }
 
 void
 TheBalls::swapBuffers()
 {
-
+	glutSwapBuffers();
 }
 
 void
 TheBalls::myinit()
 {
+
 	GLfloat light_ambient[] = { btScalar(0.2), btScalar(0.2), btScalar(0.2), btScalar(1.0) };
 	GLfloat light_diffuse[] = { btScalar(1.0), btScalar(1.0), btScalar(1.0), btScalar(1.0) };
 	GLfloat light_specular[] = { btScalar(1.0), btScalar(1.0), btScalar(1.0), btScalar(1.0 )};
@@ -148,7 +153,6 @@ TheBalls::myinit()
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHT1);
-	
 	
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
