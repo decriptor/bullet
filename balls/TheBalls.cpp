@@ -30,8 +30,10 @@ TheBalls::reshape(int w, int h)
 void
 TheBalls::renderme()
 {
-	glLoadIdentity();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glLoadIdentity();
+	gluLookAt( 0.0, 0.0, 115.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+
 
 	for (int j = m_dynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
 	{
@@ -63,6 +65,8 @@ TheBalls::renderme()
 	   btMatrix3x3 rot;
 	   rot.setIdentity();
 	   const int numObjects = m_dynamicsWorld->getNumCollisionObjects();
+	   okAt( 0.0, 0.0, 115.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+
 
 	   for(int i = 0; i < numObjects; i++)
 	   {
