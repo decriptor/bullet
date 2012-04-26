@@ -13,6 +13,86 @@ TheBalls::~TheBalls()
 }
 
 void
+TheBalls::reshape(int w, int h)
+{
+	_width = w;
+	_height = h;
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	// glOrtho Left, Right, Bottom, Top, Near, Far
+	glOrtho(-1.0, 1.5, -1.0, 1.0, -1.0, 1.0);
+	glMatrixMode(GL_MODELVIEW);
+	glViewport(0, 0, w, h);
+}
+
+void
+TheBalls::renderme()
+{
+	glLoadIdentity();
+	glPushMatrix();                             // Save Matrixes
+	glPolygonMode(GL_FRONT, GL_LINE);
+	glPolygonMode(GL_BACK, GL_FILL);
+
+	glTranslatef(-0.50, 0.50, 0.0);
+//	glRotatef(rotateX, 1.0, 0.0, 0.0);
+	glBegin(GL_POLYGON); {                        // Create a 8 sided polygon
+		glColor3f(red.r, red.g, red.b);
+		glVertex3f(-0.21, 0.0, 0.0);
+		glVertex3f(-0.07, -0.21, 0.0);
+		glColor3f(gray.r, gray.g, gray.b);
+		glVertex3f(+0.07, -0.25, 0.0);
+		glVertex3f(+0.25, -0.12, 0.0);
+		glColor3f(white.r, white.g, white.b);
+		glVertex3f(+0.08, +0.0, 0.0);
+		glVertex3f(+0.25, +0.12, 0.0);
+		glColor3f(orange.r, orange.g, orange.b);
+		glVertex3f(+0.07, +0.25, 0.0);
+		glVertex3f(-0.07, +0.21, 0.0);
+	} glEnd();
+	glPopMatrix();                              // Restore Matrixes
+
+	/*
+	   if(m_dynamicsWorld)
+	   {
+	   glDisable(GL_CULL_FACE);
+	   btScalar m[16];
+	   btMatrix3x3 rot;
+	   rot.setIdentity();
+	   const int numObjects = m_dynamicsWorld->getNumCollisionObjects();
+
+	   for(int i = 0; i < numObjects; i++)
+	   {
+	   btCollisionObject* colObj = m_dynamicsWorld->getCollisionObjectArray()[i];
+	   btRigidBody* body = btRigidBody::upcast(colObj);
+
+	   if(body && body->getMotionState())
+	   {
+	   btDefaultMotionState* myMotionState = (btDefaultMotionState*)body->getMotionState();
+	   myMotionState->m_graphicsWorldTrans.getOpenGLMatrix(m);
+	   rot=myMotionState->m_graphicsWorldTrans.getBasis();
+	   }
+	   else
+	   {
+	   colObj->getWorldTransform().getOpenGLMatrix(m);
+	   rot=colObj->getWorldTransform().getBasis();
+	   }
+
+	   btVector3 aabbMin,aabbMax;
+	   m_dynamicsWorld->getBroadphase()->getBroadphaseAabb(aabbMin,aabbMax);
+
+	   aabbMin-=btVector3(BT_LARGE_FLOAT,BT_LARGE_FLOAT,BT_LARGE_FLOAT);
+	   aabbMax+=btVector3(BT_LARGE_FLOAT,BT_LARGE_FLOAT,BT_LARGE_FLOAT);
+
+	// m_shapeDrawer->drawOpenGL(m,colObj->getCollisionShape(),wireColor,getDebugMode(),aabbMin,aabbMax);
+	}
+	}
+	*/
+	glutSwapBuffers();
+	glFlush();
+}
+
+void
 TheBalls::clientMoveAndDisplay()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -37,6 +117,47 @@ TheBalls::displayCallback()
 	renderme();
 	glFlush();
 	swapBuffers();
+}
+
+void
+TheBalls::swapBuffers()
+{
+
+}
+
+void
+TheBalls::myinit()
+{
+	GLfloat light_ambient[] = { btScalar(0.2), btScalar(0.2), btScalar(0.2), btScalar(1.0) };
+	GLfloat light_diffuse[] = { btScalar(1.0), btScalar(1.0), btScalar(1.0), btScalar(1.0) };
+	GLfloat light_specular[] = { btScalar(1.0), btScalar(1.0), btScalar(1.0), btScalar(1.0 )};
+	/*      light_position is NOT default value     */
+	GLfloat light_position0[] = { btScalar(1.0), btScalar(10.0), btScalar(1.0), btScalar(0.0 )};
+	GLfloat light_position1[] = { btScalar(-1.0), btScalar(-10.0), btScalar(-1.0), btScalar(0.0) };
+	
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position0);
+	
+	glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular);
+	glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
+	
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHT1);
+	
+	
+	glShadeModel(GL_SMOOTH);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	
+	glClearColor(btScalar(0.7),btScalar(0.7),btScalar(0.7),btScalar(0));
+	
+	//  glEnable(GL_CULL_FACE);
+	//  glCullFace(GL_BACK);
 }
 
 void
@@ -65,13 +186,13 @@ TheBalls::initPhysics()
 
 
 	// Create a few basic rigid bodies
-	btCollisionShape* groundShape = new btBoxShape(btVector(btScalar(50.),btScalar(50.),btScalar(50.)));
+	btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(50.),btScalar(50.),btScalar(50.)));
 
 	m_collisionShapes.push_back(groundShape);
 
 	btTransform groundTransform;
 	groundTransform.setIdentity();
-	groundTransform.setOrigin(btVector(0,-56,0));
+	groundTransform.setOrigin(btVector3(0,-56,0));
 
 	{
 		btScalar mass(0.);
@@ -92,7 +213,7 @@ TheBalls::initPhysics()
 	}
 	
 	{
-		btCollisionShape* colShape = new btBoxShape(btVector(1,1,1));
+		btCollisionShape* colShape = new btBoxShape(btVector3(1,1,1));
 		m_collisionShapes.push_back(colShape);
 
 		btTransform startTransform;

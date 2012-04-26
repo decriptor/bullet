@@ -1,6 +1,7 @@
 #ifndef _THEBALLS_
 #define _THEBALLS_
 
+#include "colors.h"
 #include "btBulletDynamicsCommon.h"
 
 class TheBalls
@@ -14,6 +15,9 @@ class TheBalls
 	btBroadphaseInterface* m_broadphase;
 	btCollisionDispatcher* m_dispatcher;
 	btSequentialImpulseConstraintSolver* m_solver;
+
+	int _width;
+	int _height;
 	
 	public:
 
@@ -22,6 +26,8 @@ class TheBalls
 
 		void initPhysics();
 		void exitPhysics();
+
+		void myinit();
 
 		btDynamicsWorld* getDynamicsWorld()
 		{
@@ -32,13 +38,15 @@ class TheBalls
 		void displayCallback();
 		void clientResetScene();
 
+		void renderme();
+		void reshape(int w, int h);
 		void swapBuffers();
 		void updateModifierKeys();
 
 		static TheBalls* Create()
 		{
 			TheBalls* balls = new TheBalls;
-		//	balls->myinit();
+			balls->myinit();
 			balls->initPhysics();
 			return balls;
 		}

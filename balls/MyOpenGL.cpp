@@ -28,7 +28,7 @@ int glutmain(int argc, char **argv, int width, int height, const char* title, Th
 	glutInitWindowSize(width, height);
 	glutCreateWindow(title);
 
-	//_theballs->myinit();
+	_theballs->myinit();
 
 	glutReshapeFunc(glutReshapeCallback);
 	glutIdleFunc(glutMoveAndDisplayCallback);
