@@ -95,7 +95,7 @@ TheBalls::renderme()
 	glDisable(GL_DEPTH_TEST);
 	glPushMatrix();{
 		glScalef(1.0f, -1.0f, 1.0f);
-		glTranslatef(0.0, 1.0, 0.0);
+		glTranslatef(0.0, -1.0, 0.0);
 		{
 			DrawBalls(false);
 		}
@@ -131,10 +131,10 @@ TheBalls::DrawFloor()
 			glBegin(GL_QUADS);
 			{
 				glColor4f(.9, .9, .9, 0.7);
-				glVertex3f(-m_floorSize, 0., -m_floorSize);
-				glVertex3f(-m_floorSize, 0., m_floorSize);
-				glVertex3f(m_floorSize, 0., m_floorSize);
-				glVertex3f(m_floorSize, 0., -m_floorSize);
+				glVertex3f(-m_floorSize, 1., -m_floorSize);
+				glVertex3f(-m_floorSize, 1., m_floorSize);
+				glVertex3f(m_floorSize, 1., m_floorSize);
+				glVertex3f(m_floorSize, 1., -m_floorSize);
 			}
 			glEnd();
 		} glPopMatrix();
@@ -154,8 +154,9 @@ TheBalls::DrawBalls(bool up)
 			
 			btTransform trans;
 			body->getMotionState()->getWorldTransform(trans);
-			btScalar y = trans.getOrigin().getY();
-			if(y > -0.5)
+			btScalar x = trans.getOrigin().getX();
+			btScalar z = trans.getOrigin().getZ();
+			if(up || (abs(x) <= m_floorSize + 1 && abs(z) <= m_floorSize + 1))
 			{
 				glColor3f(colors[j % 4 * 3], colors[j % 4 * 3 + 1], colors[j % 4 * 3 + 2]);
 				
@@ -306,7 +307,7 @@ TheBalls::shootBox(const btVector3& destination)
                 btVector3 linVel(0,30,-100);
                 linVel.normalize();
                 linVel*=m_ShootBoxInitialSpeed;
-		printf("the shoot speed %f\n", m_ShootBoxInitialSpeed);
+		//printf("the shoot speed %f\n", m_ShootBoxInitialSpeed);
                 body->getWorldTransform().setOrigin(camPos);
                 body->getWorldTransform().setRotation(btQuaternion(0,0,0,1));
                 body->setLinearVelocity(linVel);
