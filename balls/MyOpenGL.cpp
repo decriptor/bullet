@@ -18,6 +18,11 @@ static void glutDisplayCallback(void)
 	_theballs->displayCallback();
 }
 
+static void glutKeyboardCallback(unsigned char key, int x, int y)
+{
+	_theballs->keyboardCallback(key, x, y);
+}
+
 int glutmain(int argc, char **argv, int width, int height, const char* title, TheBalls* balls)
 {
 	_theballs = balls;
@@ -30,6 +35,7 @@ int glutmain(int argc, char **argv, int width, int height, const char* title, Th
 
 	_theballs->myinit();
 
+	glutKeyboardFunc(glutKeyboardCallback);
 	glutReshapeFunc(glutReshapeCallback);
 	glutIdleFunc(glutMoveAndDisplayCallback);
 	glutDisplayFunc(glutDisplayCallback);
