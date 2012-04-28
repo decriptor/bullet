@@ -190,8 +190,8 @@ TheBalls::clientMoveAndDisplay()
 	}
 	renderme();
 
-	swapBuffers();
-	glFlush();
+//	swapBuffers();
+//	glFlush();
 }
 
 void
@@ -201,8 +201,8 @@ TheBalls::displayCallback()
 
 	renderme();
 
-	swapBuffers();
-	glFlush();
+//	swapBuffers();
+//	glFlush();
 }
 
 void
